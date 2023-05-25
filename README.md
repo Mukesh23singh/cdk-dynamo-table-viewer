@@ -7,7 +7,6 @@ __SECURITY NOTE__: this construct was built for demonstration purposes and
 using it in production is probably a really bad idea. It exposes the entire
 contents of a DynamoDB table in your account to the general public.
 
-
 The library is published under the following names:
 
 |Language|Repository
@@ -16,7 +15,7 @@ The library is published under the following names:
 |Python|[cdk-dynamo-table-viewer](https://pypi.org/project/cdk-dynamo-table-viewer/)
 |.NET|[Eladb.DynamoTableViewer](https://www.nuget.org/packages/Eladb.DynamoTableViewer/)
 |Java|[com.github.eladb/cdk-dynamo-table-viewer](https://search.maven.org/artifact/com.github.eladb/cdk-dynamo-table-viewer)
-
+|Go|[github.com/cdklabs/cdk-dynamo-table-viewer-go/dynamotableviewer](https://pkg.go.dev/github.com/cdklabs/cdk-dynamo-table-viewer-go/dynamotableviewer)
 
 ## Usage (TypeScript/JavaScript)
 
@@ -29,7 +28,7 @@ $ npm i cdk-dynamo-table-viewer
 Add to your CDK stack:
 
 ```ts
-import { TableViewer } from 'cdk-dynamo-table-viewer'
+declare const cookiesTable: dynamodb.Table;
 
 const viewer = new TableViewer(this, 'CookiesViewer', {
   table: cookiesTable,
@@ -44,7 +43,7 @@ Notes:
   It will also be exported as a stack output.
 - Paging is not supported. This means that only the first 1MB of items will be
   displayed (again, this is a demo...)
-- Supports CDK version 0.38.0 and above
+- Supports CDK version 2.60.0 and above
 
 ## License
 

@@ -31,17 +31,10 @@ Object {
     },
   },
   "Parameters": Object {
-    "AssetParameters660d8bf7cda14859490736e7f257eb2061f9d1198652ff9682416db4ec6f196aArtifactHash40F01C63": Object {
-      "Description": "Artifact hash for asset \\"660d8bf7cda14859490736e7f257eb2061f9d1198652ff9682416db4ec6f196a\\"",
-      "Type": "String",
-    },
-    "AssetParameters660d8bf7cda14859490736e7f257eb2061f9d1198652ff9682416db4ec6f196aS3BucketCD3E0BAE": Object {
-      "Description": "S3 bucket for asset \\"660d8bf7cda14859490736e7f257eb2061f9d1198652ff9682416db4ec6f196a\\"",
-      "Type": "String",
-    },
-    "AssetParameters660d8bf7cda14859490736e7f257eb2061f9d1198652ff9682416db4ec6f196aS3VersionKey7681BC56": Object {
-      "Description": "S3 key for asset version \\"660d8bf7cda14859490736e7f257eb2061f9d1198652ff9682416db4ec6f196a\\"",
-      "Type": "String",
+    "BootstrapVersion": Object {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
     },
   },
   "Resources": Object {
@@ -76,41 +69,9 @@ Object {
       "Properties": Object {
         "Code": Object {
           "S3Bucket": Object {
-            "Ref": "AssetParameters660d8bf7cda14859490736e7f257eb2061f9d1198652ff9682416db4ec6f196aS3BucketCD3E0BAE",
+            "Fn::Sub": "cdk-hnb659fds-assets-\${AWS::AccountId}-\${AWS::Region}",
           },
-          "S3Key": Object {
-            "Fn::Join": Array [
-              "",
-              Array [
-                Object {
-                  "Fn::Select": Array [
-                    0,
-                    Object {
-                      "Fn::Split": Array [
-                        "||",
-                        Object {
-                          "Ref": "AssetParameters660d8bf7cda14859490736e7f257eb2061f9d1198652ff9682416db4ec6f196aS3VersionKey7681BC56",
-                        },
-                      ],
-                    },
-                  ],
-                },
-                Object {
-                  "Fn::Select": Array [
-                    1,
-                    Object {
-                      "Fn::Split": Array [
-                        "||",
-                        Object {
-                          "Ref": "AssetParameters660d8bf7cda14859490736e7f257eb2061f9d1198652ff9682416db4ec6f196aS3VersionKey7681BC56",
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            ],
-          },
+          "S3Key": "6ef63c8e0feb2ee73d336465b0d50733c8ede8bfdb37d27af4a6582fecd14ed0.zip",
         },
         "Environment": Object {
           "Variables": Object {
@@ -128,7 +89,7 @@ Object {
             "Arn",
           ],
         },
-        "Runtime": "nodejs12.x",
+        "Runtime": "nodejs18.x",
       },
       "Type": "AWS::Lambda::Function",
     },
@@ -176,6 +137,7 @@ Object {
                 "dynamodb:GetItem",
                 "dynamodb:Scan",
                 "dynamodb:ConditionCheckItem",
+                "dynamodb:DescribeTable",
               ],
               "Effect": "Allow",
               "Resource": Array [
@@ -324,6 +286,7 @@ Object {
       "Type": "AWS::Lambda::Permission",
     },
     "viewerViewerEndpointAccount1D965397": Object {
+      "DeletionPolicy": "Retain",
       "DependsOn": Array [
         "viewerViewerEndpointDED2DEA4",
       ],
@@ -336,8 +299,10 @@ Object {
         },
       },
       "Type": "AWS::ApiGateway::Account",
+      "UpdateReplacePolicy": "Retain",
     },
     "viewerViewerEndpointCloudWatchRole28045685": Object {
+      "DeletionPolicy": "Retain",
       "Properties": Object {
         "AssumeRolePolicyDocument": Object {
           "Statement": Array [
@@ -367,6 +332,7 @@ Object {
         ],
       },
       "Type": "AWS::IAM::Role",
+      "UpdateReplacePolicy": "Retain",
     },
     "viewerViewerEndpointDED2DEA4": Object {
       "Properties": Object {
@@ -389,6 +355,9 @@ Object {
       "Type": "AWS::ApiGateway::Deployment",
     },
     "viewerViewerEndpointDeploymentStageprod95943DC5": Object {
+      "DependsOn": Array [
+        "viewerViewerEndpointAccount1D965397",
+      ],
       "Properties": Object {
         "DeploymentId": Object {
           "Ref": "viewerViewerEndpointDeployment00B069459b597739070db86e729796710f9f86da",
@@ -532,6 +501,33 @@ Object {
         },
       },
       "Type": "AWS::ApiGateway::Method",
+    },
+  },
+  "Rules": Object {
+    "CheckBootstrapVersion": Object {
+      "Assertions": Array [
+        Object {
+          "Assert": Object {
+            "Fn::Not": Array [
+              Object {
+                "Fn::Contains": Array [
+                  Array [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  Object {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
     },
   },
 }
